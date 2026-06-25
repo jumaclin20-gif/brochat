@@ -2,7 +2,7 @@
 
 > Real-time fitness motivation + world time + gun game for bros in Kisumu & USA
 
-**Live App:** `https://[weka-username-yako].github.io/brochat/`
+**Live App:** `https://jumaclin20.gif.github.io/brochat/`
 
 ### ✨ Features
 
