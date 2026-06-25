@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bro Chat</title>
+<style>
+body{background:#0f0f1e;color:#fff;font-family:sans-serif;margin:0;padding:10px}
+.header{text-align:center;padding:15px}
+.header h1{font-size:28px;color:#e94560;margin:5px 0}
+.nav{display:flex;gap:8px;margin:10px 0}
+.nav button{flex:1;background:#0f3460;border:none;color:#fff;padding:12px;border-radius:10px;font-weight:700}
+.nav button.active{background:#e94560}
+.screen{display:none}
+.screen.active{display:block}
+.card{background:#1a1a2e;border-radius:15px;padding:20px;margin:12px 0;border:1px solid #2a2a4e}
+.card h2{color:#e94560;margin-bottom:12px;font-size:18px}
+.time{font-size:32px;font-weight:900;color:#0f3460;text-align:center;margin:10px 0}
+.rate{color:#e94560;font-size:32px;font-weight:900}
+.quote{color:#ccc;font-size:15px;font-style:italic;text-align:center;padding:12px;background:#0f0f1e;border-radius:10px;border-left:4px solid #e94560}
+.btn{width:100%;padding:14px;margin:6px 0;border:none;border-radius:10px;font-size:14px;font-weight:800;background:#0f3460;color:#fff}
+.btn-red{background:#e94560}
+#gunCanvas{background:#000;border-radius:10px;width:100%;margin:8px 0}
+.stats{display:flex;justify-content:space-between;margin:8px 0;font-weight:700}
+#messages{height:200px;overflow-y:auto;background:#0f0f1e;padding:10px;border-radius:8px;margin:10px 0}
+.msg{margin:6px 0;padding:8px;background:#1a1a2e;border-radius:8px;font-size:13px}
+.msg.me{background:#0f3460;text-align:right}
+input{background:#0f0f1e;color:#fff;border:1px solid #2a2a4e;width:100%;padding:10px;margin:5px 0;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="font-size:40px">💪🏋️</div>
+  <h1>Bro Chat</h1>
+  <p style="color:#888;font-size:14px">Kisumu + USA | 0117958605</p>
+</div>
+
+<div class="nav">
+  <button onclick="showTab(0)" class="active" id="btn0">🏠 Home</button>
+  <button onclick="showTab(1)" id="btn1">🔫 Game</button>
+  <button onclick="showTab(2)" id="btn2">💬 Chat</button>
+</div>
+
+<div id="screen0" class="screen active">
+  <div class="card">
+    <h2>💭 Daily Motivation</h2>
+    <div class="quote" id="quote">Bro, discipline weighs ounces but regret weighs tons. Hit the gym! 💪</div>
+    <button class="btn" onclick="newQuote()">🔄 New Quote</button>
+  </div>
+  <div class="card">
+    <h2>🕐 World Time - LIVE</h2>
+    <div style="display:flex;justify-content:space-around;text-align:center">
+      <div><div style="color:#888;font-size:12px">Kisumu</div><div class="time" id="ke">--:--</div></div>
+      <div><div style="color:#888;font-size:12px">USA ET</div><div class="time" id="us">--:--</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>💵 Exchange Rate</h2>
+    <div class="time"><span class="rate" id="rate">150.00</span></div>
+    <div style="text-align:center;color:#888;font-size:13px">1 USD = KES</div>
+    <div style="text-align:center;color:#666;font-size:11px;margin-top:8px" id="updateTime">Loading...</div>
+  </div>
+</div>
+
+<div id="screen1" class="screen">
+  <div class="card">
+    <h2>🔫 Gun Simulator</h2>
+    <div class="stats">
+      <span>Score: <span id="score">0</span></span>
+      <span>Ammo: <span id="ammo">30</span>/30</span>
+    </div>
+    <canvas id="gunCanvas" width="350" height="200"></canvas>
+    <button class="btn btn-red" onclick="shoot()">🔥 FIRE</button>
+    <button class="btn" onclick="reloadGun()">🔄 RELOAD</button>
+  </div>
+</div>
+
+<div id="screen2" class="screen">
+  <div class="card">
+    <h2>💬 Local Notes</h2>
+    <p style="color:#888;font-size:12px;margin-bottom:10px">Save notes offline. P2P chat na Martin inakuja next.</p>
+    <div id="messages"></div>
+    <input id="msg" placeholder="Type note...">
+    <button class="btn" onclick="sendLocal()">📤 Save Note</button>
+    <button class="btn" onclick="clearNotes()" style="background:#666">🗑️ Clear All</button>
+  </div>
+</div>
+
+<script>
+function showTab(n){
+  var screens=document.getElementsByClassName("screen");
+  var btns=document.getElementsByClassName("nav")[0].getElementsByTagName("button");
+  for(var i=0;i<screens.length;i++){screens[i].classList.remove("active");btns[i].classList.remove("active")}
+  document.getElementById("screen"+n).classList.add("active");
+  document.getElementById("btn"+n).classList.add("active")
+}
+
+var quotes=["Bro, discipline weighs ounces but regret weighs tons. Hit the gym! 💪","Time zone tofauti, but same grind. We rise together! 🚀","1% better daily. That’s the bro code. Keep pushing! 🔥","Your future self at the gym is watching. Don’t disappoint him.","Dollars abroad, discipline at home. Build the empire bro 💰","No excuses. Kisumu bros don't skip leg day OR prayer 🙏","Pain is temporary, but quitting lasts forever. Shoot your shot!","Bro, hata protein shake haiwezi kukupa gains kama consistency"];
+
+function newQuote(){document.getElementById("quote").innerText=quotes[Math.floor(Math.random()*quotes.length)]}
+
+function updateTime(){
+  var now=new Date();
+  document.getElementById("ke").innerText=new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Nairobi',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now);
+  document.getElementById("us").innerText=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now)
+}
+updateTime();setInterval(updateTime,1000);
+
+var lastRate=localStorage.getItem("usdRate")||"150.00";
+document.getElementById("rate").innerText=lastRate;
+
+function updateRate(){
+  fetch("https://open.er-api.com/v6/latest/USD").then(function(r){return r.json()}).then(function(d){
+    lastRate=d.rates.KES.toFixed(2);localStorage.setItem("usdRate",lastRate);
+    document.getElementById("rate").innerText=lastRate;
+    document.getElementById("updateTime").innerText="Updated: "+new Date().toLocaleTimeString()
+  }).catch(function(){document.getElementById("updateTime").innerText="Offline - Cached"})}
+setTimeout(updateRate,1000);setInterval(updateRate,300000);
+
+var score=0,ammo=30,targets=[],canvas=document.getElementById("gunCanvas"),ctx=canvas.getContext("2d");
+function drawGame(){ctx.fillStyle="#111";ctx.fillRect(0,0,350,200);ctx.fillStyle="#e94560";
+for(var i=0;i<targets.length;i++){var t=targets[i];ctx.beginPath();ctx.arc(t.x,t.y,10,0,Math.PI*2);ctx.fill();t.y+=2;if(t.y>200)targets.splice(i,1)}
+if(Math.random()<0.03)targets.push({x:Math.random()*330+10,y:-10});requestAnimationFrame(drawGame)}
+drawGame();
+
+function shoot(){if(ammo<=0){alert("Out of ammo! Reload bro");return}ammo--;document.getElementById("ammo").innerText=ammo;
+if(targets.length>0){targets.shift();score+=10;document.getElementById("score").innerText=score}if(navigator.vibrate)navigator.vibrate(50)}
+
+function reloadGun(){ammo=30;document.getElementById("ammo").innerText=ammo}
+
+function sendLocal(){var text=document.getElementById("msg").value;if(!text)return;
+var notes=JSON.parse(localStorage.getItem("notes")||"[]");notes.push({text:text,time:new Date().toLocaleTimeString()});
+localStorage.setItem("notes",JSON.stringify(notes));document.getElementById("msg").value="";loadNotes()}
+
+function loadNotes(){var notes=JSON.parse(localStorage.getItem("notes")||"[]");var html="";
+for(var i=0;i<notes.length;i++){html+='<div class="msg me"><b>Me '+notes[i].time+':</b> '+notes[i].text+'</div>'}
+document.getElementById("messages").innerHTML=html}
+
+function clearNotes(){localStorage.removeItem("notes");loadNotes()}
+loadNotes();
+</script>
+</body>
+  </html>
